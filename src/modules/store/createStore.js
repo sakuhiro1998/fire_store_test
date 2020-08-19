@@ -1,14 +1,16 @@
 import {
     createStore as reduxCreateStore,
     combineReducers,
-    applyMiddleware
+    applyMiddleware,
+    compose
 } from 'redux';
 import thunk from 'redux-thunk';
 import { routerMiddleware, connectRouter } from 'connected-react-router'
+import persistState from "redux-localstorage";
 import userInfo from './reducers/userInfo'
 
 export default function createStore(history) {
-    return reduxCreateStore(
+    return  compose(persistState())(reduxCreateStore)(
         combineReducers({
             userInfo: userInfo,
             router: connectRouter(history),
