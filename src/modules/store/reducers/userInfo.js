@@ -1,7 +1,9 @@
 const initialState = {
     userId:'',
     userName: '',
-    reserveDay: ''
+    reserveDay: '',
+    reserveNum:'',
+    room:''
 };
 
 export default function userInfo(state = initialState, action) {
@@ -23,7 +25,9 @@ export function setUserInfo(input) {
             payload: {
                 userId: input.id,
                 userName: input.name,
-                reserveDay: input.reservation
+                reserveDay: input.reservation,
+                reserveNum: input.reserveNum,
+                room: input.room
             }
         });
     };

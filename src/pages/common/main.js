@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { Switch, Route } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { firebaseInfo } from '../../plugins/firebase';
@@ -7,8 +7,9 @@ import { AppBar, Divider, Drawer, Hidden, IconButton, List, ListItem, ListItemIc
 import { MoveToInbox, Mail, Menu, Notifications, MeetingRoom } from '@material-ui/icons';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Home from '../home/home'
+import NewReservation from '../newReservation/newReservation'
 
-import {setUserInfo} from '../../modules/store/reducers/userInfo';
+import { setUserInfo } from '../../modules/store/reducers/userInfo';
 
 const drawerWidth = 240;
 
@@ -66,37 +67,35 @@ export default function Main(props) {
 
     useEffect(() => {
         (async () => {
-            if(userInfo.userId) {
-                firebaseInfo.firestore().collection('userInfo').doc(userInfo.userId).get().then(response =>{
-                    dispatch(setUserInfo(response.data()));
-                   
-                }).catch(error => {
-                    alert('データの取得に失敗しました。もう一度ログインしてください。');
-                    dispatch(push('/'));
-                   
-                })
-            } else {
-                alert('もう一度ログインしてください。');
+            if (userInfo.userId === null || userInfo.userId === '') {
+                alert('お手数ですが、もう一度ログインしてください。');
                 dispatch(push('/'));
+                return false;
             }
         })()
     }, []);
 
     const drawer = (
         <div>
-            <div className={classes.toolbar} >  
-            <div className={classes.logo}>
-                <img src={`${process.env.PUBLIC_URL}/logo192.png`} width='55' height='55' />
+            <div className={classes.toolbar} >
+                <div className={classes.logo}>
+                    <img src={`${process.env.PUBLIC_URL}/logo192.png`} width='55' height='55' />
                 </div>
             </div>
             <Divider />
             <List>
-                {['ホーム', '新規予約', '予約変更'].map((text, index) => (
-                    <ListItem button key={text}>
-                        <ListItemIcon>{index % 2 === 0 ? <MoveToInbox /> : <Mail />}</ListItemIcon>
-                        <ListItemText primary={text} />
-                    </ListItem>
-                ))}
+                <ListItem button key={'ホーム'} onClick={() => dispatch(getOshirase())}>
+                    <ListItemIcon><MoveToInbox /></ListItemIcon>
+                    <ListItemText primary={'ホーム'} />
+                </ListItem>
+                <ListItem button key={'新規予約'} onClick={() => dispatch(getNewReservationInfo())}>
+                    <ListItemIcon><MoveToInbox /></ListItemIcon>
+                    <ListItemText primary={'新規予約'} />
+                </ListItem>
+                <ListItem button key={'予約変更'}>
+                    <ListItemIcon><Mail /></ListItemIcon>
+                    <ListItemText primary={'予約変更'} />
+                </ListItem>
             </List>
             <Divider />
 
@@ -105,78 +104,107 @@ export default function Main(props) {
 
     return (
         <div className={classes.root}>
-                {userInfo.userId ? 
-            <>
-                <AppBar position='fixed' className={classes.appBar}>
-                <Toolbar>
-                    <IconButton
-                        color='inherit'
-                        aria-label='open drawer'
-                        edge='start'
-                        onClick={handleDrawerToggle}
-                        className={classes.menuButton}
-                    >
-                        <Menu />
-                    </IconButton>
-                    <Typography variant='h6' className={classes.title} noWrap>
-                        ようこそ　{userInfo.userName}　さん
-                    </Typography>
-                    <Tooltip title='お知らせ'>
-                        <IconButton color='inherit'>
-                            <Badge badgeContent={0} color='secondary'>
-                                <Notifications />
-                            </Badge>
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title='ログアウト'>
-                        <IconButton color='inherit'>
-                            <Badge color='secondary'>
-                                <MeetingRoom />
-                            </Badge>
-                        </IconButton>
-                    </Tooltip>
-                </Toolbar>
-            </AppBar>
-            <nav className={classes.drawer}>
-                <Hidden xsDown implementation='css'>
-                    <Drawer
-                        classes={{
-                            paper: classes.drawerPaper,
-                        }}
-                        variant='permanent'
-                        open
-                    >
-                        {drawer}
-                    </Drawer>
-                </Hidden>
-                <Hidden smUp implementation='css'>
-                    <Drawer
-                        container={container}
-                        variant='temporary'
-                        anchor={'left'}
-                        open={mobileOpen}
-                        onClose={handleDrawerToggle}
-                        classes={{
-                            paper: classes.drawerPaper,
-                        }}
-                        ModalProps={{
-                            keepMounted: true,
-                        }}
-                    >
-                        {drawer}
-                    </Drawer>
-                </Hidden>
-            </nav>
+            {userInfo.userId ?
+                <>
+                    <AppBar position='fixed' className={classes.appBar}>
+                        <Toolbar>
+                            <IconButton
+                                color='inherit'
+                                aria-label='open drawer'
+                                edge='start'
+                                onClick={handleDrawerToggle}
+                                className={classes.menuButton}
+                            >
+                                <Menu />
+                            </IconButton>
+                            <Typography variant='h6' className={classes.title} noWrap>
+                                ようこそ　{userInfo.userName}　さん
+                            </Typography>
+                            <Tooltip title='お知らせ'>
+                                <IconButton color='inherit'>
+                                    <Badge badgeContent={0} color='secondary'>
+                                        <Notifications />
+                                    </Badge>
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title='ログアウト'>
+                                <IconButton color='inherit'>
+                                    <Badge color='secondary'>
+                                        <MeetingRoom />
+                                    </Badge>
+                                </IconButton>
+                            </Tooltip>
+                        </Toolbar>
+                    </AppBar>
+                    <nav className={classes.drawer}>
+                        <Hidden xsDown implementation='css'>
+                            <Drawer
+                                classes={{
+                                    paper: classes.drawerPaper,
+                                }}
+                                variant='permanent'
+                                open
+                            >
+                                {drawer}
+                            </Drawer>
+                        </Hidden>
+                        <Hidden smUp implementation='css'>
+                            <Drawer
+                                container={container}
+                                variant='temporary'
+                                anchor={'left'}
+                                open={mobileOpen}
+                                onClose={handleDrawerToggle}
+                                classes={{
+                                    paper: classes.drawerPaper,
+                                }}
+                                ModalProps={{
+                                    keepMounted: true,
+                                }}
+                            >
+                                {drawer}
+                            </Drawer>
+                        </Hidden>
+                    </nav>
 
-            <main className={classes.content}>
-                <div className={classes.toolbar} />
-                <Switch>
-                    <Route exact path='/Home' component={Home} />
-                    <Route exact path='/Reg' component={Home} />
-                </Switch>
-            </main>
-            </> : <></>}
-            
+                    <main className={classes.content}>
+                        <div className={classes.toolbar} />
+                        <Switch>
+                            <Route exact path='/Home' component={Home} />
+                            <Route exact path='/NewReservation' component={NewReservation} />
+                        </Switch>
+                    </main>
+                </> : <></>}
         </div>
     );
 };
+
+const getNewReservationInfo = () => {
+    return dispatch => {
+        dispatch(push('/NewReservation'));
+        /* firebaseInfo.firestore().collection('userInfo').doc(userId).get().then(response => {
+            dispatch(setUserInfo(response.data()));
+            dispatch(push('/home'));
+            return false;
+        }).catch(error => {
+            alert('データの取得に失敗しました。');
+            return false;
+        }) */
+
+    }
+}
+
+const getOshirase = () => {
+    return dispatch => {
+        dispatch(push('/Home'));
+        /* firebaseInfo.firestore().collection('userInfo').doc(userId).get().then(response => {
+            dispatch(setUserInfo(response.data()));
+            dispatch(push('/home'));
+            return false;
+        }).catch(error => {
+            alert('データの取得に失敗しました。');
+            return false;
+        }) */
+
+    }
+}
