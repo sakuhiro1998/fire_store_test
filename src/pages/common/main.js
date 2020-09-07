@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { firebaseInfo } from '../../plugins/firebase';
 import { push } from 'connected-react-router';
 import { AppBar, Divider, Drawer, Hidden, IconButton, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography, Badge, Tooltip } from '@material-ui/core';
-import { MoveToInbox, Mail, Menu, Notifications, MeetingRoom } from '@material-ui/icons';
+import { MoveToInbox, Mail, Menu, Notifications, MeetingRoom , AddBox ,Refresh} from '@material-ui/icons';
+import HomeIcon from '@material-ui/icons/Home';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Home from '../home/home'
 import NewReservation from '../newReservation/newReservation'
@@ -85,15 +86,15 @@ export default function Main(props) {
             <Divider />
             <List>
                 <ListItem button key={'ホーム'} onClick={() => dispatch(getOshirase())}>
-                    <ListItemIcon><MoveToInbox /></ListItemIcon>
+                    <ListItemIcon><HomeIcon /></ListItemIcon>
                     <ListItemText primary={'ホーム'} />
                 </ListItem>
                 <ListItem button key={'新規予約'} onClick={() => dispatch(getNewReservationInfo())}>
-                    <ListItemIcon><MoveToInbox /></ListItemIcon>
+                    <ListItemIcon><AddBox /></ListItemIcon>
                     <ListItemText primary={'新規予約'} />
                 </ListItem>
                 <ListItem button key={'予約変更'}>
-                    <ListItemIcon><Mail /></ListItemIcon>
+                    <ListItemIcon><Refresh /></ListItemIcon>
                     <ListItemText primary={'予約変更'} />
                 </ListItem>
             </List>

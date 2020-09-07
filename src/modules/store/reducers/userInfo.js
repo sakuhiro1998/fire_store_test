@@ -11,7 +11,7 @@ export default function userInfo(state = initialState, action) {
     switch (action.type) {
         case 'SET_USER_INFO':
             newState = Object.assign({}, state);
-            return newState.input = action.payload;
+            return newState = action.payload;
 
         default:
             return state;
